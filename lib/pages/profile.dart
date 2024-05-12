@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:starlibrary/layouts/editprof.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(ProfileApp());
@@ -11,105 +13,104 @@ class ProfileApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
-            'Saved Profile',
-            style: TextStyle(
-              color: Colors.black,
+            "Profile",
+            style: GoogleFonts.montserrat(
+              color: Color(0xFF800000),
               fontWeight: FontWeight.bold,
             ),
           ),
-          backgroundColor: Colors.white,
-          centerTitle: true,
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: ProfileScreen(),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 100,
+                backgroundImage: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/2919/2919906.png'),
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Name:',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text(
+                    'John Doe',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ],
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Email:', // Label untuk email
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text(
+                    'john.doe@example.com', // Ganti dengan email pengguna Anda
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 20),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditProfileForm()),
+                      );
+                    },
+                    icon: Icon(Icons.edit),
+                    label: Text('Edit Profile'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 20),
+                  InkWell(
+                    onTap: () {
+                      // Fungsi untuk logout
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout),
+                        SizedBox(width: 5),
+                        Text(
+                          'Logout',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 40.0),
-        Row(
-          children: [
-            Icon(
-              Icons.person,
-              size: 30.0,
-            ),
-            SizedBox(width: 10.0),
-            Text("Name"),
-          ],
-        ),
-        SizedBox(height: 10.0),
-        Container(
-          width: double.infinity,
-          child: TextFormField(
-            maxLines: 1,
-            decoration: InputDecoration(
-              hintText: 'Enter your name',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6.0),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-            ),
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Row(
-          children: [
-            Icon(
-              Icons.email,
-              size: 30.0,
-            ),
-            SizedBox(width: 10.0),
-            Text("Email"),
-          ],
-        ),
-        SizedBox(height: 10.0),
-        Container(
-          width: double.infinity,
-          child: TextFormField(
-            maxLines: 1,
-            decoration: InputDecoration(
-              hintText: 'Enter your email',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6.0),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-            ),
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Row(
-          children: [
-            Icon(
-              Icons.edit,
-              size: 30.0,
-            ),
-            SizedBox(width: 10.0),
-            Text("Edit Profile"),
-          ],
-        ),
-        SizedBox(height: 20.0),
-        Row(
-          children: [
-            Icon(
-              Icons.exit_to_app,
-              size: 30.0,
-            ),
-            SizedBox(width: 10.0),
-            Text("Sign Out"),
-          ],
-        ),
-        SizedBox(height: 40.0),
-      ],
     );
   }
 }

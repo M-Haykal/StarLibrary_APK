@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:starlibrary/layouts/Navbar.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MaterialApp(
       home: HomePage(),
@@ -19,6 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> {
+  List<Map<String, dynamic>> _bukus = [];
+
   void _showModal(BuildContext context) {
     showBarModalBottomSheet(
       expand: true,
@@ -51,7 +56,7 @@ class _HomePage extends State<HomePage> {
           SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
-              itemCount: 10, // Ganti dengan jumlah buku yang Anda miliki
+              itemCount: 10,
               itemBuilder: (context, index) {
                 return _buildBookCard();
               },
@@ -62,7 +67,7 @@ class _HomePage extends State<HomePage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text("Close"),
+            child: Icon(Icons.close),
           ),
           SizedBox(height: 20)
         ],
@@ -108,6 +113,36 @@ class _HomePage extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getListBuku();
+  }
+
+  Future<void> _getListBuku() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+
+    if (token.isEmpty) {
+      // Jika tidak ada token, maka tampilkan pesan atau lakukan tindakan lainnya
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('http://127.0.0.1:8000/api/auth/listbuku'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        _bukus = List<Map<String, dynamic>>.from(data['bukus']);
+      });
+    } else {
+      // Handle error response
+    }
   }
 
   @override
@@ -212,17 +247,47 @@ class _HomePage extends State<HomePage> {
                           viewportFraction: 0.8)),
                 ],
               )),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [Card()],
+          GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            children: _bukus.map((buku) {
+              return Container(
+                margin: EdgeInsets.all(8.0),
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: 18.0 / 11.0,
+                        child: Image.network(
+                          'http://127.0.0.1:8000/storage/${buku['thumbnail']}',
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'Judul: ${buku['judul']}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text('Penerbit: ${buku['penerbit']}'),
+                            Text('Pengarang: ${buku['pengarang']}'),
+                            Text('Stok Buku: ${buku['stok_buku']}'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Row(),
-                Row()
-              ],
-            ),
+              );
+            }).toList(),
           )
         ],
       ),

@@ -20,7 +20,7 @@ class Welcome extends StatelessWidget {
           onFinish: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Nav()),
+              MaterialPageRoute(builder: (context) => SignupPage()),
             );
           },
           skipTextButton: Text('skip'),

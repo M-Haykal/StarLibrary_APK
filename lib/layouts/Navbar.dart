@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:starlibrary/pages/HomePage.dart';
+import 'package:starlibrary/pages/online_book.dart';
 import 'package:starlibrary/pages/profile.dart';
 
 class Nav extends StatefulWidget {
@@ -13,7 +14,7 @@ class _NavState extends State<Nav> {
   int _selectedIndex = 0;
   List<Widget> _widgetOptions = <Widget>[
     HomePage(),
-    Text('Online Book'),
+    OnlineBook(),
     ProfileApp()
   ];
 
@@ -51,7 +52,7 @@ class _NavState extends State<Nav> {
             ),
             BottomNavigationBarItem(
               label: 'Online Book',
-              icon: Icon(Icons.book_outlined,
+              icon: Icon(Icons.book,
                   color: _selectedIndex == 1 ? _selectedIconColor : _iconColor),
             ),
             BottomNavigationBarItem(

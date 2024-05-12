@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:starlibrary/layouts/Navbar.dart';
-import 'package:starlibrary/pages/HomePage.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:starlibrary/pages/welcome.dart';
-import 'package:starlibrary/pages/SplasScreen.dart';
-import 'package:starlibrary/pages/profile.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Future.delayed(
+    Duration(seconds: 1),
+  );
+  FlutterNativeSplash.remove();
   runApp(MainApp());
 }
 
@@ -15,9 +18,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Tambahkan ini untuk menyembunyikan banner debug
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.red
+        primaryColor: Colors.red,
+        useMaterial3: true,
       ),
       home: Welcome(),
     );
