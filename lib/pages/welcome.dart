@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:starlibrary/pages/HomePage.dart';
 import 'package:starlibrary/pages/RegistrasionPage.dart';
 import 'package:starlibrary/pages/LoginPage.dart';
@@ -23,56 +24,90 @@ class Welcome extends StatelessWidget {
               MaterialPageRoute(builder: (context) => SignupPage()),
             );
           },
-          skipTextButton: Text('skip'),
+          skipTextButton: Text(
+            '',
+            style: GoogleFonts.montserrat(
+              color: Color(0xFF800000),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           trailing: GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        LoginPage()),
+                MaterialPageRoute(builder: (context) => LoginPage()),
               );
             },
-            child: Text('Login',),
+            child: Text(
+              'Login',
+              style: GoogleFonts.montserrat(
+                color: Color(0xFF800000),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           background: [
-            Image.asset('assets/contoh.jpg'),
-            Image.asset('assets/contoh.jpg'),
-            Image.asset('assets/contoh.jpg'),
+            Image.asset('assets/bg.png'),
+            Image.asset('assets/bg.png'),
+            Image.asset('assets/bg.png'),
           ],
           totalPage: 3,
           speed: 1.8,
           pageBodies: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[
                   SizedBox(
                     height: 400,
+                    child: Image.asset('assets/Asset2.png'),
                   ),
-                  Text('XI PPLG 1')
+                  Text(
+                    'StarLibrary',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFF800000),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[
                   SizedBox(
                     height: 400,
+                    child: Image.asset('assets/Asset3.png'),
                   ),
-                  Text('XI PPLG 1')
+                  Text(
+                    'Create By XI PPLG 1',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFF800000),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[
                   SizedBox(
                     height: 400,
+                    child: Image.asset('assets/Asset1.png'),
                   ),
-                  Text('XI PPLG 1')
+                  Text(
+                    'Let’s Get Started',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFF800000),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               ),
             )

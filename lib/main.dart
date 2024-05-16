@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:starlibrary/pages/HomePage.dart';
+import 'package:starlibrary/pages/LoginPage.dart';
 import 'package:starlibrary/pages/welcome.dart';
 
 void main() async {
