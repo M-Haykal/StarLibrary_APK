@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:starlibrary/pages/RegistrasionPage.dart';
+import 'package:starlibrary/pages/HomePage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   @override
-  void iniState() {
+  void initState() {
     _checkLoggedIn();
     super.initState();
   }
@@ -33,12 +34,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    final response = await http
-        .post(Uri.parse('http://10.0.2.2:8000/api/auth/login'), body: {
-      'email': emailController.text,
-      'password': passwordController.text,
-      'login_as': 'customer',
-    });
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/api/auth/login'),
+      body: {
+        'email': emailController.text,
+        'password': passwordController.text,
+        'login_as': 'costumer',
+      },
+    );
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       String token = data['token'];
@@ -48,7 +52,10 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('email', emailController.text);
       await prefs.setString('password', passwordController.text);
 
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     } else {
       final data = jsonDecode(response.body);
       showDialog(
@@ -119,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
         TextField(
           controller: emailController,
           decoration: InputDecoration(
-              hintText: "Username",
+              hintText: "Email",
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide.none),
@@ -137,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                 borderSide: BorderSide.none),
             fillColor: Colors.grey.withOpacity(0.1),
             filled: true,
-            prefixIcon: const Icon(Icons.password),
+            prefixIcon: const Icon(Icons.lock),
           ),
           obscureText: true,
         ),
@@ -177,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Dont have an account? "),
+        const Text("Don't have an account? "),
         TextButton(
             onPressed: () {
               Navigator.push(
