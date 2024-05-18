@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:starlibrary/pages/RegistrasionPage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -72,6 +72,14 @@ class _LoginPageState extends State<LoginPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
         body: Container(
           margin: const EdgeInsets.all(24),
           child: Column(
@@ -88,13 +96,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _header(context) {
-    return const Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Welcome Back",
-          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+          "Hi, Welcome!",
+          style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.bold),
         ),
-        Text("Enter your credential to login"),
+        Text(
+          "Please enter your username/email and password to sign in",
+          style:
+              GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.normal),
+        ),
       ],
     );
   }
@@ -135,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () {},
             child: const Text(
               "Forgot password?",
-              style: TextStyle(color: Colors.purple),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),
@@ -147,12 +160,14 @@ class _LoginPageState extends State<LoginPage> {
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(vertical: 16),
-            backgroundColor: Colors.purple,
+            backgroundColor: Color(0xFF800000),
           ),
-          child: const Text(
-            "Login",
-            style: TextStyle(fontSize: 20),
-          ),
+          child: Text("Login",
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.normal,
+              )),
         )
       ],
     );
@@ -170,9 +185,9 @@ class _LoginPageState extends State<LoginPage> {
                 MaterialPageRoute(builder: (context) => SignupPage()),
               );
             },
-            child: const Text(
+            child: Text(
               "Sign Up",
-              style: TextStyle(color: Colors.purple),
+              style: TextStyle(color: Colors.blue),
             ))
       ],
     );

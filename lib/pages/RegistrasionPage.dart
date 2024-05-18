@@ -10,6 +10,14 @@ class SignupPage extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
         body: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -28,17 +36,6 @@ class SignupPage extends StatelessWidget {
                           color: Colors.black,
                           fontWeight: FontWeight.normal,
                         )),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      "Create your account",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    )
                   ],
                 ),
                 Column(
@@ -124,7 +121,7 @@ class SignupPage extends StatelessWidget {
                           "Sign In",
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: Color(0xFF800000),
+                            color: Colors.blue,
                             fontWeight: FontWeight.normal,
                           ),
                         ))
