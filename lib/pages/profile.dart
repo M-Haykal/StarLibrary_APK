@@ -14,12 +14,32 @@ class ProfileApp extends StatelessWidget {
     await prefs.remove('token');
     await prefs.remove('email');
     await prefs.remove('password');
+    await prefs.remove('profile');
+    await prefs.remove('nama'); // Remove stored name
+    await prefs.remove('email'); // Remove stored email
 
-    // Gantikan halaman saat ini dengan LoginPage
+    // Replace the current page with LoginPage
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
+  }
+
+  Future<String> _getProfileImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String profilePath = prefs.getString('profile') ?? 'default_profile.png';
+    String baseUrl = 'http://perpus.amwp.website/storage/';
+    return '$baseUrl$profilePath';
+  }
+
+  Future<String> _getStoredName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('nama') ?? 'John Doe';
+  }
+
+  Future<String> _getStoredEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('email') ?? 'john.doe@example.com';
   }
 
   @override
@@ -37,92 +57,107 @@ class ProfileApp extends StatelessWidget {
             ),
           ),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 100,
-                backgroundImage: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/512/2919/2919906.png'),
-              ),
-              SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'Name:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        body: FutureBuilder(
+          future: Future.wait(
+              [_getProfileImage(), _getStoredName(), _getStoredEmail()]),
+          builder: (context, AsyncSnapshot<List<String>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error loading data'));
+            } else {
+              String profileImageUrl = snapshot.data![0];
+              String name = snapshot.data![1];
+              String email = snapshot.data![2];
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 100,
+                      backgroundImage: NetworkImage(profileImageUrl),
                     ),
-                  ),
-                  Text(
-                    'John Doe',
-                    style: TextStyle(fontSize: 24),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'Email:', // Label untuk email
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text(
-                    'john.doe@example.com', // Ganti dengan email pengguna Anda
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: 20),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfileApp()),
-                      );
-                    },
-                    icon: Icon(Icons.edit),
-                    label: Text('Edit Profile'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: 20),
-                  InkWell(
-                    onTap: () {
-                      _logout(context);
-                    },
-                    child: Row(
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Icons.logout),
-                        SizedBox(width: 5),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            'Name:',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
                         Text(
-                          'Logout',
+                          name,
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            'Email:',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Text(
+                          email,
                           style: TextStyle(fontSize: 18),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 20),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfileApp()),
+                            );
+                          },
+                          icon: Icon(Icons.edit),
+                          label: Text('Edit Profile'),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 20),
+                        InkWell(
+                          onTap: () {
+                            _logout(context);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.logout),
+                              SizedBox(width: 5),
+                              Text(
+                                'Logout',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
         ),
       ),
     );
