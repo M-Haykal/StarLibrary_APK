@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:starlibrary/layouts/editprof.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:starlibrary/pages/LoginPage.dart';
 
 void main() {
   runApp(ProfileApp());
 }
 
 class ProfileApp extends StatelessWidget {
+  Future<void> _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('email');
+    await prefs.remove('password');
+
+    // Gantikan halaman saat ini dengan LoginPage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,8 +91,7 @@ class ProfileApp extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileApp()),
+                        MaterialPageRoute(builder: (context) => ProfileApp()),
                       );
                     },
                     icon: Icon(Icons.edit),
@@ -92,7 +106,7 @@ class ProfileApp extends StatelessWidget {
                   SizedBox(width: 20),
                   InkWell(
                     onTap: () {
-                      // Fungsi untuk logout
+                      _logout(context);
                     },
                     child: Row(
                       children: [
