@@ -60,7 +60,7 @@ class Welcome extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(
                     height: 400,
-                    child: Image.asset('assets/Asset2.png'),
+                    child: Image.asset('assets/part2.png'),
                   ),
                   Text(
                     'StarLibrary',
@@ -79,7 +79,7 @@ class Welcome extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(
                     height: 400,
-                    child: Image.asset('assets/Asset3.png'),
+                    child: Image.asset('assets/part3.png'),
                   ),
                   Text(
                     'Create By XI PPLG 1',
@@ -98,7 +98,7 @@ class Welcome extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(
                     height: 400,
-                    child: Image.asset('assets/Asset1.png'),
+                    child: Image.asset('assets/part1.png'),
                   ),
                   Text(
                     'Let’s Get Started',

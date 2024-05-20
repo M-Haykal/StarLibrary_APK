@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:http/http.dart' as http;
@@ -131,7 +132,7 @@ class _HomePage extends State<HomePage> {
     }
 
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/auth/listbuku'),
+      Uri.parse('http://perpus.amwp.website/api/auth/listbuku'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -247,48 +248,40 @@ class _HomePage extends State<HomePage> {
                           viewportFraction: 0.8)),
                 ],
               )),
-          GridView.count(
+          ListView(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            crossAxisCount: 2,
             children: _bukus.map((buku) {
-              return Container(
-                margin: EdgeInsets.all(8.0),
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
+              return Card(
+                clipBehavior: Clip.antiAlias,
+                elevation: 3,
+                margin: EdgeInsets.all(5),
+                child: ListTile(
+                  // onTap: () {
+                  //   // Lakukan tindakan saat item dipilih, misalnya tampilkan detail buku
+                  // },
+                  leading: Image.network(
+                    'http://perpus.amwp.website/storage/${buku['thumbnail']}',
+                    height: 200,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(
+                    'Title: ${buku['judul']}',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: 18.0 / 11.0,
-                        child: Image.network(
-                          'http://127.0.0.1:8000/storage/${buku['thumbnail']}',
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'Judul: ${buku['judul']}',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text('Penerbit: ${buku['penerbit']}'),
-                            Text('Pengarang: ${buku['pengarang']}'),
-                            Text('Stok Buku: ${buku['stok_buku']}'),
-                          ],
-                        ),
-                      ),
+                      Text('Publisher: ${buku['penerbit']}'),
+                      Text('Author: ${buku['pengarang']}'),
+                      Text('Book Stock: ${buku['stok_buku']}'),
                     ],
                   ),
                 ),
               );
             }).toList(),
-          )
+          ),
         ],
       ),
     );

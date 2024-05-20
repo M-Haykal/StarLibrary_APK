@@ -18,6 +18,7 @@ dependencies:
   image_input: ^0.0.2
   modal_bottom_sheet: ^3.0.0
   shared_preferences: ^2.2.2
+  image_picker: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -33,6 +34,9 @@ flutter:
     - assets/Asset2.png
     - assets/Asset3.png
     - assets/bg.png
+    - assets/part1.png
+    - assets/part2.png
+    - assets/part3.png
 
 flutter_native_splash:
   # This package generates native code to customize Flutter's default white native splash screen

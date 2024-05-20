@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:starlibrary/layouts/Navbar.dart';
 import 'package:starlibrary/pages/RegistrasionPage.dart';
 import 'package:starlibrary/pages/HomePage.dart';
 
@@ -35,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _login() async {
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/auth/login'),
+      Uri.parse('http://perpus.amwp.website/api/auth/login'),
       body: {
         'email': emailController.text,
         'password': passwordController.text,
@@ -54,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => Nav()),
       );
     } else {
       final data = jsonDecode(response.body);
