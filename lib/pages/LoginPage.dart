@@ -47,9 +47,15 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       String token = data['token'];
+      String profile = data['user']['profile_picture'];
+      String nama = data['user']['nama'];
+      String email = data['user']['email'];
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
+      await prefs.setString('profile', profile);
+      await prefs.setString('nama', nama);
+      await prefs.setString('email', email);
       await prefs.setString('email', emailController.text);
       await prefs.setString('password', passwordController.text);
 
