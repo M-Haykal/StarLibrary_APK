@@ -3,6 +3,7 @@ import 'package:starlibrary/layouts/editprof.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starlibrary/pages/LoginPage.dart';
+import 'package:starlibrary/pages/welcome.dart';
 
 void main() {
   runApp(ProfileApp());
@@ -18,7 +19,7 @@ class ProfileApp extends StatelessWidget {
     // Gantikan halaman saat ini dengan LoginPage
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => Welcome()),
     );
   }
 
