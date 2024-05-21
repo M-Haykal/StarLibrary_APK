@@ -127,7 +127,7 @@ class _HomePage extends State<HomePage> {
     String token = prefs.getString('token') ?? '';
 
     if (token.isEmpty) {
-      // Jika tidak ada token, maka tampilkan pesan atau lakukan tindakan lainnya
+      // If no token is found, display a message or take other action
       return;
     }
 
@@ -138,11 +138,21 @@ class _HomePage extends State<HomePage> {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      setState(() {
-        _bukus = List<Map<String, dynamic>>.from(data['bukus']);
-      });
+
+      // Check if 'bukus' is present and is not null
+      if (data['bukus'] != null) {
+        setState(() {
+          _bukus = List<Map<String, dynamic>>.from(data['bukus']);
+        });
+      } else {
+        // Handle the case where 'bukus' is null or not present
+        // For example, log an error or show a message
+        print('Error: bukus is null or not present in the response');
+      }
     } else {
       // Handle error response
+      print(
+          'Error: Failed to fetch list buku. Status code: ${response.statusCode}');
     }
   }
 

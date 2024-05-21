@@ -124,7 +124,7 @@ class ProfileApp extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ProfileApp()),
+                                  builder: (context) => EditProfileApp()),
                             );
                           },
                           icon: Icon(Icons.edit),
