@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:starlibrary/layouts/fav.dart';
 
 void main() => runApp(MaterialApp(
       home: HomePage(),
@@ -168,13 +169,35 @@ class _HomePage extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.list),
-            onPressed: () {
-              _showModal(context);
-            },
-          ),
+        actions: <Widget>[
+          Builder(
+            builder: (context) => PopupMenuButton<String>(
+              onSelected: (value) {
+                print('Selected: $value');
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'Borrow',
+                  child: Text('Borrow List'),
+                  onTap: () {
+                    _showModal(context);
+                  },
+                ),
+                PopupMenuItem(
+                  value: 'Favorite',
+                  child: Text('Favorite Book'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BookshelfScreen()),
+                    );
+                  },
+                ),
+                // Add more options as needed
+              ],
+            ),
+          )
         ],
       ),
       body: ListView(
@@ -258,6 +281,14 @@ class _HomePage extends State<HomePage> {
                           viewportFraction: 0.8)),
                 ],
               )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text("Offline Book",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                )),
+          ),
           ListView(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -267,9 +298,7 @@ class _HomePage extends State<HomePage> {
                 elevation: 3,
                 margin: EdgeInsets.all(5),
                 child: ListTile(
-                  // onTap: () {
-                  //   // Lakukan tindakan saat item dipilih, misalnya tampilkan detail buku
-                  // },
+                  onTap: () {},
                   leading: Image.network(
                     'http://perpus.amwp.website/storage/${buku['thumbnail']}',
                     height: 200,
@@ -285,7 +314,7 @@ class _HomePage extends State<HomePage> {
                     children: <Widget>[
                       Text('Publisher: ${buku['penerbit']}'),
                       Text('Author: ${buku['pengarang']}'),
-                      Text('Book Stock: ${buku['stok_buku']}'),
+                      Text('Stock: ${buku['stok_buku']}'),
                     ],
                   ),
                 ),

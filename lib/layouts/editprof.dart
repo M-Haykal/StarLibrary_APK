@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:starlibrary/pages/profile.dart';
 
 void main() {
   runApp(EditProfileApp());
@@ -45,8 +46,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
-          },
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileApp()),
+      );
+    },
         ),
         centerTitle: true,
         title: Text("Edit Profile"),
