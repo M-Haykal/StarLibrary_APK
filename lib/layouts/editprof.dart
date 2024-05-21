@@ -46,11 +46,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ProfileApp()),
-      );
-    },
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfileApp()),
+            );
+          },
         ),
         centerTitle: true,
         title: Text("Edit Profile"),

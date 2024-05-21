@@ -7,7 +7,8 @@ import 'package:starlibrary/pages/welcome.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // await Permission.camera.request();
+  // await Permission.storage.request();
   // Menunda hide splash screen selama 1 detik
   await Future.delayed(Duration(seconds: 1));
 
