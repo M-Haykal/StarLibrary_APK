@@ -50,12 +50,14 @@ class _LoginPageState extends State<LoginPage> {
       String profile = data['user']['profile_picture'];
       String nama = data['user']['nama'];
       String email = data['user']['email'];
+      int id = data['user']['id']; // Use 'int' instead of 'Int'
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
       await prefs.setString('profile', profile);
       await prefs.setString('nama', nama);
       await prefs.setString('email', email);
+      await prefs.setInt('id', id);
       await prefs.setString('email', emailController.text);
       await prefs.setString('password', passwordController.text);
 

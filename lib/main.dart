@@ -4,10 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starlibrary/pages/HomePage.dart';
 import 'package:starlibrary/pages/LoginPage.dart';
 import 'package:starlibrary/pages/welcome.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Permission.camera.request();
+  await Permission.storage.request();
   // Menunda hide splash screen selama 1 detik
   await Future.delayed(Duration(seconds: 1));
 
