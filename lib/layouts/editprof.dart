@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 class EditProfileApp extends StatelessWidget {
   @override
@@ -60,10 +63,49 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      File? croppedFile = await _cropImageToSquare(File(pickedFile.path));
+      if (croppedFile != null) {
+        setState(() {
+          _image = croppedFile;
+        });
+      }
     }
+  }
+
+  Future<File?> _cropImageToSquare(File imageFile) async {
+    final bytes = await imageFile.readAsBytes();
+    final originalImage = await decodeImageFromList(bytes);
+
+    int originalWidth = originalImage.width;
+    int originalHeight = originalImage.height;
+
+    int cropSize =
+        originalWidth < originalHeight ? originalWidth : originalHeight;
+
+    int offsetX = (originalWidth - cropSize) ~/ 2;
+    int offsetY = (originalHeight - cropSize) ~/ 2;
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    final srcRect = Rect.fromLTWH(offsetX.toDouble(), offsetY.toDouble(),
+        cropSize.toDouble(), cropSize.toDouble());
+    final dstRect =
+        Rect.fromLTWH(0, 0, cropSize.toDouble(), cropSize.toDouble());
+
+    canvas.drawImageRect(originalImage, srcRect, dstRect, Paint());
+
+    final croppedImage =
+        await recorder.endRecording().toImage(cropSize, cropSize);
+    final croppedBytes =
+        await croppedImage.toByteData(format: ui.ImageByteFormat.png);
+
+    final directory = await getApplicationDocumentsDirectory();
+    final croppedFile = File(path.join(directory.path, 'cropped_image.png'));
+
+    await croppedFile.writeAsBytes(croppedBytes!.buffer.asUint8List());
+
+    return croppedFile;
   }
 
   Future<void> _saveProfileData() async {
