@@ -47,14 +47,15 @@ class Welcome extends StatelessWidget {
             ),
           ),
           background: [
-            Image.asset('assets/bg.png'),
-            Image.asset('assets/bg.png'),
-            Image.asset('assets/bg.png'),
+            Container(color: Colors.white),
+            Container(color: Colors.white),
+            Container(color: Colors.white),
           ],
           totalPage: 3,
           speed: 1.8,
           pageBodies: [
             Container(
+              color: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[
@@ -74,6 +75,7 @@ class Welcome extends StatelessWidget {
               ),
             ),
             Container(
+              color: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[
@@ -93,6 +95,7 @@ class Welcome extends StatelessWidget {
               ),
             ),
             Container(
+              color: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               child: Column(
                 children: <Widget>[

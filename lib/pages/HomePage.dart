@@ -159,6 +159,19 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount;
+
+    if (screenWidth < 400) {
+      crossAxisCount = 1; // Small screen
+    } else if (screenWidth < 900) {
+      crossAxisCount = 2; // Medium screen
+    } else if (screenWidth < 1200) {
+      crossAxisCount = 3; // Medium screen
+    } else {
+      crossAxisCount = 4; // Large screen
+    }
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -289,37 +302,64 @@ class _HomePage extends State<HomePage> {
                   fontWeight: FontWeight.normal,
                 )),
           ),
-          ListView(
+          GridView.builder(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            children: _bukus.map((buku) {
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: 0.7,
+              crossAxisSpacing: 5.0,
+              mainAxisSpacing: 5.0,
+            ),
+            itemCount: _bukus.length,
+            itemBuilder: (context, index) {
+              final buku = _bukus[index];
               return Card(
                 clipBehavior: Clip.antiAlias,
                 elevation: 3,
                 margin: EdgeInsets.all(5),
-                child: ListTile(
-                  onTap: () {},
-                  leading: Image.network(
-                    'http://perpus.amwp.website/storage/${buku['thumbnail']}',
-                    height: 200,
-                    width: 50,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Text(
-                    'Title: ${buku['judul']}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Publisher: ${buku['penerbit']}'),
-                      Text('Author: ${buku['pengarang']}'),
-                      Text('Stock: ${buku['stok_buku']}'),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 1.0,
+                      child: Image.network(
+                        'http://perpus.amwp.website/storage/${buku['thumbnail']}',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Title: ${buku['judul']}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Publisher: ${buku['penerbit']}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'Author: ${buku['pengarang']}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'Book Stock: ${buku['stok_buku']}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
-            }).toList(),
+            },
           ),
         ],
       ),
