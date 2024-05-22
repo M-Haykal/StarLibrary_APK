@@ -16,6 +16,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _passwordVisible = false; // Variable to track password visibility
 
   @override
   void initState() {
@@ -50,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       String profile = data['user']['profile_picture'];
       String nama = data['user']['nama'];
       String email = data['user']['email'];
-      int id = data['user']['id']; // Use 'int' instead of 'Int'
+      int id = data['user']['id'];
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
@@ -146,6 +147,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 10),
         TextField(
           controller: passwordController,
+          obscureText: !_passwordVisible, // Toggle password visibility
           decoration: InputDecoration(
             hintText: "Password",
             border: OutlineInputBorder(
@@ -154,8 +156,17 @@ class _LoginPageState extends State<LoginPage> {
             fillColor: Colors.grey.withOpacity(0.1),
             filled: true,
             prefixIcon: const Icon(Icons.lock),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _passwordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _passwordVisible = !_passwordVisible;
+                });
+              },
+            ),
           ),
-          obscureText: true,
         ),
         const SizedBox(height: 10),
         Align(

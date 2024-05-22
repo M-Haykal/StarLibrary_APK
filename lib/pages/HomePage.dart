@@ -25,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   List<Map<String, dynamic>> _bukus = [];
+  List<Map<String, dynamic>> _borrowList = [];
 
   void _showModal(BuildContext context) {
     showBarModalBottomSheet(
@@ -32,6 +33,29 @@ class _HomePage extends State<HomePage> {
       context: context,
       builder: (context) => _buildModalContent(context),
     );
+  }
+
+  Future<void> _getBorrowList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int id = prefs.getInt('id') ?? 0;
+
+    final response = await http.get(
+      Uri.parse('http://perpus.amwp.website/api/auth/listpeminjaman'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success']) {
+        setState(() {
+          _borrowList = List<Map<String, dynamic>>.from(data['data']);
+          // Filter the borrow list based on matching siswa_id
+          _borrowList.removeWhere(
+              (borrowItem) => borrowItem['siswa_id'] != id.toString());
+        });
+      }
+    } else {
+      print('Failed to fetch borrow list. Status code: ${response.statusCode}');
+    }
   }
 
   Widget _buildModalContent(BuildContext context) {
@@ -58,9 +82,25 @@ class _HomePage extends State<HomePage> {
           SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
-              itemCount: 10,
+              itemCount: _borrowList.length,
               itemBuilder: (context, index) {
-                return _buildBookCard();
+                final borrowItem = _borrowList[index];
+                return ListTile(
+                  leading: Container(
+                    width: 60,
+                    height: 60,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        'http://perpus.amwp.website/storage/${borrowItem['thumbnail']}',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  title: Text(borrowItem['judul'] ?? ''),
+                  subtitle: Text(borrowItem['pengarang'] ?? ''),
+                  trailing: Text(borrowItem['status'] ?? ''),
+                );
               },
             ),
           ),
@@ -121,6 +161,7 @@ class _HomePage extends State<HomePage> {
   void initState() {
     super.initState();
     _getListBuku();
+    _getBorrowList();
   }
 
   Future<void> _getListBuku() async {
