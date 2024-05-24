@@ -1,42 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:starlibrary/pages/online_book.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  runApp(MyApp());
-}
+class DetailPage extends StatelessWidget {
+  final Data buku;
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Book Detail',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: BookDetailPage(),
-      debugShowCheckedModeBanner: false, // Remove the debug banner
-    );
-  }
-}
+  DetailPage({required this.buku});
 
-class BookDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Detail Product',
-          style: TextStyle(color: Colors.black), // Set the title color to black
+          style: TextStyle(color: Colors.black), 
         ),
-        centerTitle: true, // Center the title
-        backgroundColor: Colors.white, // Set the AppBar color to white
+        centerTitle: true, 
+        backgroundColor: Colors.white, 
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black), // Back arrow icon
+          icon: Icon(Icons.arrow_back, color: Colors.black), 
           onPressed: () {
-            // Handle back button press
             Navigator.of(context).pop();
           },
         ),
-        iconTheme: IconThemeData(color: Colors.black), // Set the icon color to black
+        iconTheme:
+            IconThemeData(color: Colors.black), 
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -44,30 +32,39 @@ class BookDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Image.asset(
-                'images/buku_coding.jpg', // Replace with your book cover image URL
+              child: Image.network(
+                'http://perpus.amwp.website/' +
+                    (buku.thumbnail ?? 'images/placeholder.jpg'),
                 height: 200,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.image_not_supported, size: 200);
+                },
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'The Great Book Title',
+              buku.judul ?? 'No Title',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16), // Adjusted the spacing after removing the prices
+            SizedBox(height: 16),
+            Text(
+              'Penerbit: ${buku.penerbit ?? 'Unknown'}',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Pengarang: ${buku.pengarang ?? 'Unknown'}',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
             Text(
               'Deskripsi',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Text(
-              'Lorem ipsum dolor sit amet consectetur adipiscing elit. Quasi, eum? Id, culpa? At officia quisquam laudantium nisi mollitia nesciunt, qui porro asperiores cum voluptates placeat similique recusandae in facere quos vitae?',
+              buku.deskripsi ?? 'No Description',
               style: TextStyle(fontSize: 14),
-            ),
-            SizedBox(height: 16),
-            Text(
-              '100% good reviews\n7 days returns\nWarranty not applicable',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             Spacer(),
             Row(
@@ -84,7 +81,11 @@ class BookDetailPage extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final pdfUrl =
+                          'http://perpus.amwp.website/' + (buku.pdfFile ?? '');
+                      _launchURL(pdfUrl);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
@@ -97,5 +98,14 @@ class BookDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Function to launch URL
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

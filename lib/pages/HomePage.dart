@@ -344,6 +344,7 @@ class _HomePage extends State<HomePage> {
                 )),
           ),
           GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -378,7 +379,7 @@ class _HomePage extends State<HomePage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
