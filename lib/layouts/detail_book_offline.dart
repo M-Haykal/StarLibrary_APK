@@ -55,7 +55,7 @@ class _BookDetailsState extends State<BookOffline> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            // Add your code here
+            Navigator.of(context).pop();
           },
         ),
         actions: [],
