@@ -47,9 +47,15 @@ class Welcome extends StatelessWidget {
             ),
           ),
           background: [
-            Container(color: Colors.white),
-            Container(color: Colors.white),
-            Container(color: Colors.white),
+            Container(
+                color: Color(
+                    0xFF800000)), // Ubah warna latar belakang sesuai keinginan Anda
+            Container(
+                color: Color(
+                    0xFF800000)), // Ubah warna latar belakang sesuai keinginan Anda
+            Container(
+                color: Color(
+                    0xFF800000)), // Ubah warna latar belakang sesuai keinginan Anda
           ],
           totalPage: 3,
           speed: 1.8,

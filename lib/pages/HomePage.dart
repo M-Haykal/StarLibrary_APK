@@ -10,6 +10,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starlibrary/layouts/detail_book_offline.dart';
 import 'package:starlibrary/layouts/fav.dart';
+import 'dart:async';
 
 void main() => runApp(MaterialApp(
       home: HomePage(),
@@ -18,7 +19,7 @@ void main() => runApp(MaterialApp(
 
 @override
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePage();
@@ -27,6 +28,9 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   List<Map<String, dynamic>> _bukus = [];
   List<Map<String, dynamic>> _borrowList = [];
+  Timer? _timer;
+  String _searchText = '';
+  bool _isRefreshing = false;
 
   void _showModal(BuildContext context) {
     showBarModalBottomSheet(
@@ -163,6 +167,16 @@ class _HomePage extends State<HomePage> {
     super.initState();
     _getListBuku();
     _getBorrowList();
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      _getBorrowList();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // Cancel the timer to avoid memory leaks
+    _timer?.cancel();
   }
 
   Future<void> _getListBuku() async {
@@ -199,12 +213,29 @@ class _HomePage extends State<HomePage> {
     }
   }
 
+  void _performSearch(String query) {
+    setState(() {
+      _searchText = query;
+    });
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _isRefreshing = true;
+    });
+    await _getListBuku();
+    await _getBorrowList();
+    setState(() {
+      _isRefreshing = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     int crossAxisCount;
 
-    if (screenWidth < 400) {
+    if (screenWidth < 492.002) {
       crossAxisCount = 1; // Small screen
     } else if (screenWidth < 900) {
       crossAxisCount = 2; // Medium screen
@@ -255,166 +286,183 @@ class _HomePage extends State<HomePage> {
           )
         ],
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Pick of the day",
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          opacity: _isRefreshing ? 0.5 : 1.0,
+          child: ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Pick of the day",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        )),
+                    SizedBox(height: 10),
+                    TextField(
+                      onChanged: _performSearch,
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(35.0),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Most Popular",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          )),
+                      CarouselSlider(
+                          items: [
+                            Container(
+                              margin: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
+                                    fit: BoxFit.cover),
+                              ),
+                            )
+                          ],
+                          options: CarouselOptions(
+                              height: 180.0,
+                              enlargeCenterPage: true,
+                              autoPlay: true,
+                              aspectRatio: 16 / 9,
+                              autoPlayCurve: Curves.fastOutSlowIn,
+                              enableInfiniteScroll: true,
+                              autoPlayAnimationDuration:
+                                  Duration(milliseconds: 800),
+                              viewportFraction: 0.8)),
+                    ],
+                  )),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text("Offline Book",
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
                     )),
-                SizedBox(height: 10),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search",
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35.0),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 12.0),
-                  ),
+              ),
+              GridView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: 0.7,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
                 ),
-              ],
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Most Popular",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                      )),
-                  CarouselSlider(
-                      items: [
-                        Container(
-                          margin: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                fit: BoxFit.cover),
-                          ),
+                itemCount: _bukus.where((buku) {
+                  final title = buku['judul'].toString().toLowerCase();
+                  return title.contains(_searchText.toLowerCase());
+                }).length,
+                itemBuilder: (context, index) {
+                  final filteredBukus = _bukus.where((buku) {
+                    final title = buku['judul'].toString().toLowerCase();
+                    return title.contains(_searchText.toLowerCase());
+                  }).toList();
+
+                  final buku = filteredBukus[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BookOffline(bookId: buku['id']),
                         ),
-                        Container(
-                          margin: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                fit: BoxFit.cover),
+                      );
+                    },
+                    child: Card(
+                      clipBehavior: Clip.antiAlias,
+                      elevation: 3,
+                      margin: EdgeInsets.all(5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 1.0,
+                            child: Image.network(
+                              'http://perpus.amwp.website/storage/${buku['thumbnail']}',
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                fit: BoxFit.cover),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Title: ${buku['judul']}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        )
-                      ],
-                      options: CarouselOptions(
-                          height: 180.0,
-                          enlargeCenterPage: true,
-                          autoPlay: true,
-                          aspectRatio: 16 / 9,
-                          autoPlayCurve: Curves.fastOutSlowIn,
-                          enableInfiniteScroll: true,
-                          autoPlayAnimationDuration:
-                              Duration(milliseconds: 800),
-                          viewportFraction: 0.8)),
-                ],
-              )),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text("Offline Book",
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                )),
-          ),
-          GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 5.0,
-              mainAxisSpacing: 5.0,
-            ),
-            itemCount: _bukus.length,
-            itemBuilder: (context, index) {
-              final buku = _bukus[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookOffline(),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 6.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Publisher: ${buku['penerbit']}',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  'Author: ${buku['pengarang']}',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  'Book Stock: ${buku['stok_buku']}',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  elevation: 3,
-                  margin: EdgeInsets.all(5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 1.0,
-                        child: Image.network(
-                          'http://perpus.amwp.website/storage/${buku['thumbnail']}',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Title: ${buku['judul']}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Publisher: ${buku['penerbit']}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              'Author: ${buku['pengarang']}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              'Book Stock: ${buku['stok_buku']}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

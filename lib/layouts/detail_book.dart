@@ -15,89 +15,147 @@ class DetailPage extends StatelessWidget {
         title: Text(
           "Offline Book Detail",
           style: GoogleFonts.montserrat(
-            color: Color(0xFF800000),
+            color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,  
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black), 
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        iconTheme:
-            IconThemeData(color: Colors.black), 
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Image.network(
-                'http://perpus.amwp.website/' +
-                    (buku.thumbnail ?? 'images/placeholder.jpg'),
-                height: 200,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.image_not_supported, size: 200);
-                },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      'http://perpus.amwp.website/storage/' +
+                          (buku.thumbnail ?? 'images/placeholder.jpg'),
+                      height: 200,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.image_not_supported, size: 200);
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              buku.judul ?? 'No Title',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Penerbit: ${buku.penerbit ?? 'Unknown'}',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Pengarang: ${buku.pengarang ?? 'Unknown'}',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Deskripsi',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              buku.deskripsi ?? 'No Description',
-              style: TextStyle(fontSize: 14),
-            ),
-            Spacer(),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow[700],
-                    ),
-                    child: Text('Favorite'),
-                  ),
+              SizedBox(height: 24),
+              Text(
+                buku.judul ?? 'No Title',
+                style: GoogleFonts.montserrat(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      final pdfUrl =
-                          'http://perpus.amwp.website/' + (buku.pdfFile ?? '');
-                      _launchURL(pdfUrl);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    child: Text('Reading Now'),
-                  ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Penerbit: ${buku.penerbit ?? 'Unknown'}',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF666666),
                 ),
-              ],
-            ),
-          ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Pengarang: ${buku.pengarang ?? 'Unknown'}',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF666666),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Deskripsi',
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                buku.deskripsi ?? 'No Description',
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  color: Color(0xFF666666),
+                ),
+              ),
+              SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFFFC107),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        elevation: 5,
+                      ),
+                      child: Text(
+                        'Favorite',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _launchURL('http://perpus.amwp.website/storage/' +
+                            (buku.pdfFile ?? ''));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFd32f2f),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                        elevation: 5,
+                      ),
+                      child: Text(
+                        'Reading Now',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -106,7 +164,7 @@ class DetailPage extends StatelessWidget {
   // Function to launch URL
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
-      await launch(url);
+      await launch(url, forceWebView: false);
     } else {
       throw 'Could not launch $url';
     }

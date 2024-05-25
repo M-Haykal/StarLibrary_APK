@@ -114,7 +114,7 @@ class _OnlineBookState extends State<OnlineBook> {
                                   AspectRatio(
                                     aspectRatio: 1.0,
                                     child: Image.network(
-                                      'http://perpus.amwp.website/' +
+                                      'http://perpus.amwp.website/storage/' +
                                           (item.thumbnail ?? ''),
                                       fit: BoxFit.cover,
                                       errorBuilder:
