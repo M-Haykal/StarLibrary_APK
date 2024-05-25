@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:starlibrary/pages/online_book.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 
 class DetailPage extends StatelessWidget {
   final Data buku;
@@ -131,8 +131,16 @@ class DetailPage extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        _launchURL('http://perpus.amwp.website/storage/' +
-                            (buku.pdfFile ?? ''));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PDFViewerFromUrl(
+                              url: 'http://perpus.amwp.website/storage/' +
+                                  (buku.pdfFile ?? ''),
+                              title: buku.judul ?? 'PDF From Url',
+                            ),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFd32f2f),
@@ -160,13 +168,45 @@ class DetailPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  // Function to launch URL
-  Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url, forceWebView: false);
-    } else {
-      throw 'Could not launch $url';
-    }
+class PDFViewerFromUrl extends StatelessWidget {
+  const PDFViewerFromUrl({Key? key, required this.url, required this.title})
+      : super(key: key);
+
+  final String url;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: PDF().fromUrl(
+        url,
+        placeholder: (double progress) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                value: progress / 100,
+                color: Colors.blue,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Loading... ${progress.toStringAsFixed(0)}%',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF666666),
+                ),
+              ),
+            ],
+          ),
+        ),
+        errorWidget: (dynamic error) => Center(child: Text(error.toString())),
+      ),
+    );
   }
 }
