@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:starlibrary/layouts/detail_book_offline.dart';
 import 'package:starlibrary/layouts/fav.dart';
 
 void main() => runApp(MaterialApp(
@@ -356,49 +357,59 @@ class _HomePage extends State<HomePage> {
             itemCount: _bukus.length,
             itemBuilder: (context, index) {
               final buku = _bukus[index];
-              return Card(
-                clipBehavior: Clip.antiAlias,
-                elevation: 3,
-                margin: EdgeInsets.all(5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 1.0,
-                      child: Image.network(
-                        'http://perpus.amwp.website/storage/${buku['thumbnail']}',
-                        fit: BoxFit.cover,
-                      ),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookOffline(),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Title: ${buku['judul']}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+                  );
+                },
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 3,
+                  margin: EdgeInsets.all(5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1.0,
+                        child: Image.network(
+                          'http://perpus.amwp.website/storage/${buku['thumbnail']}',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Publisher: ${buku['penerbit']}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'Author: ${buku['pengarang']}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'Book Stock: ${buku['stok_buku']}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Title: ${buku['judul']}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Publisher: ${buku['penerbit']}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'Author: ${buku['pengarang']}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'Book Stock: ${buku['stok_buku']}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

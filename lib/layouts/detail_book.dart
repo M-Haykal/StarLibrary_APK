@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:starlibrary/pages/online_book.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,11 +13,13 @@ class DetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Detail Product',
-          style: TextStyle(color: Colors.black), 
+          "Offline Book Detail",
+          style: GoogleFonts.montserrat(
+            color: Color(0xFF800000),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        centerTitle: true, 
-        backgroundColor: Colors.white, 
+        centerTitle: true,  
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black), 
           onPressed: () {
