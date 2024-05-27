@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,7 +28,99 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class BookshelfScreen extends StatelessWidget {
+class BookshelfScreen extends StatefulWidget {
+  @override
+  _BookshelfScreenState createState() => _BookshelfScreenState();
+}
+
+class _BookshelfScreenState extends State<BookshelfScreen> {
+  List<dynamic> _favorites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFavorites();
+  }
+
+  Future<void> _fetchFavorites() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    int? userId = prefs.getInt('id');
+
+    if (token.isEmpty || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: No token or user ID found. Please log in.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          'http://perpus.amwp.website/api/auth/favorite?siswa_id=$userId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        _favorites = data['favorites']
+            .where((favorite) => favorite['siswa_id'] == userId.toString())
+            .toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Error: Failed to fetch favorites. Status code: ${response.statusCode}'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> _removeFromFavorites(int bookId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    int? userId = prefs.getInt('id');
+
+    if (token.isEmpty || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: No token or user ID found. Please log in.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    final response = await http.delete(
+      Uri.parse('http://perpus.amwp.website/api/auth/favorite'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'siswa_id': userId,
+        'buku_id': bookId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Refresh favorites after removal
+      _fetchFavorites();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Book removed from favorites successfully!'),
+        backgroundColor: Colors.green,
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Error: Failed to remove book from favorites. Status code: ${response.statusCode}'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +133,8 @@ class BookshelfScreen extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
-        iconTheme: IconThemeData(color: Colors.black), // Ensure icon color is black
+        iconTheme:
+            IconThemeData(color: Colors.black), // Ensure icon color is black
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Use the arrow back icon
           onPressed: () {
@@ -48,29 +144,26 @@ class BookshelfScreen extends StatelessWidget {
           },
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 8), // Add some top padding
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Your Favorite Books\nin one place',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8), // Add some top padding
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Your Favorite Books\nin one place',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _favorites.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : Container(
                       height: 400, // Set a specific height for the grid
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -79,20 +172,70 @@ class BookshelfScreen extends StatelessWidget {
                           mainAxisSpacing: 16.0,
                           childAspectRatio: 0.7,
                         ),
-                        itemCount: 6,
+                        itemCount: _favorites.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            color: Colors.grey[300],
+                          final favorite = _favorites[index]['buku'];
+                          return GestureDetector(
+                            onTap: () {
+                              // Define the action when the book is tapped
+                              // For example, navigate to book details screen
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    spreadRadius: 1,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Image.network(
+                                        'http://perpus.amwp.website/storage/${favorite['thumbnail']}',
+                                        fit: BoxFit.cover,
+                                        height: 150,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          favorite['judul'],
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: IconButton(
+                                      icon: Icon(Icons.delete_forever),
+                                      onPressed: () {
+                                        // Remove from favorites
+                                        _removeFromFavorites(favorite['id']);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
                         },
                       ),
                     ),
-                  ],
-                ),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

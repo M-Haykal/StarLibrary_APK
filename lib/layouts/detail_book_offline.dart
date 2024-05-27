@@ -31,7 +31,6 @@ class _BookOfflineState extends State<BookOffline> {
     String token = prefs.getString('token') ?? '';
 
     if (token.isEmpty) {
-      // If no token is found, display a message or take other action
       return;
     }
 
@@ -64,7 +63,6 @@ class _BookOfflineState extends State<BookOffline> {
     String token = prefs.getString('token') ?? '';
 
     if (token.isEmpty) {
-      // If no token is found, display a message or take other action
       return;
     }
 
@@ -78,7 +76,6 @@ class _BookOfflineState extends State<BookOffline> {
       if (data['reviews'] != null) {
         setState(() {
           _reviews = List<Map<String, dynamic>>.from(data['reviews']);
-          // Sort reviews by created_at date
           _reviews.sort((a, b) => DateTime.parse(b['created_at'])
               .compareTo(DateTime.parse(a['created_at'])));
         });
@@ -127,6 +124,59 @@ class _BookOfflineState extends State<BookOffline> {
     }
   }
 
+  Future<void> _addToFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    int? userId = prefs.getInt('id');
+
+    if (token.isEmpty || userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: No token or user ID found. Please log in.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('http://perpus.amwp.website/api/auth/favorite'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'siswa_id': userId,
+        'buku_id': widget.bookId,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Book added to favorites successfully!'),
+        backgroundColor: Colors.green,
+      ));
+    } else if (response.statusCode == 409) {
+      final responseData = jsonDecode(response.body);
+      if (responseData['message'] == 'Buku sudah ada di favorit') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('The book is already in your favorites.'),
+          backgroundColor: Colors.orange,
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Error: Failed to add book to favorites. Status code: ${response.statusCode}'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Error: Failed to add book to favorites. Status code: ${response.statusCode}'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_bookDetails == null) {
@@ -163,7 +213,7 @@ class _BookOfflineState extends State<BookOffline> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   SizedBox(
-                    height: constraints.maxWidth * 3 / 4, // Aspect ratio 4:3
+                    height: constraints.maxWidth * 3 / 4,
                     child: Center(
                       child: Container(
                         decoration: BoxDecoration(
@@ -230,15 +280,36 @@ class _BookOfflineState extends State<BookOffline> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _borrowBook,
-                    child: Text(
-                      'Borrow',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF800000),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _borrowBook,
+                        child: Text(
+                          'Borrow',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF800000),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _addToFavorite,
+                        child: Row(
+                          children: [
+                            Icon(Icons.favorite_border, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Add to Favorite',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16),
                   Row(
