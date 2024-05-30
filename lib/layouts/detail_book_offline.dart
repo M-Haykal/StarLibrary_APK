@@ -106,13 +106,13 @@ class _BookOfflineState extends State<BookOffline> {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      _showAlertDialog('Success', 'Book borrowed successfully!', Colors.green,
-          Icons.check_circle);
+      _showAlertDialog(
+          'Success', 'Peminjaman sukses!', Colors.green, Icons.check_circle);
     } else if (response.statusCode == 409) {
       _showAlertDialog(
-          'Error', 'Book is already borrowed.', Colors.orange, Icons.error);
+          'Info', 'Buku sudah dipinjam.', Colors.orange, Icons.error);
     } else if (response.statusCode == 400) {
-      _showAlertDialog('Error', 'Buku Habis.', Colors.orange, Icons.error);
+      _showAlertDialog('Info', 'Buku Habis.', Colors.orange, Icons.error);
     } else {
       _showAlertDialog(
           'Error',
