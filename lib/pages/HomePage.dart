@@ -10,6 +10,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starlibrary/layouts/detail_book_offline.dart';
 import 'package:starlibrary/layouts/fav.dart';
+import 'package:starlibrary/layouts/BorrowDetailPage.dart';
 import 'dart:async';
 
 void main() => runApp(MaterialApp(
@@ -28,6 +29,7 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   List<Map<String, dynamic>> _bukus = [];
   List<Map<String, dynamic>> _borrowList = [];
+  List<String> _mostPopularBookThumbnails = [];
   Timer? _timer;
   String _searchText = '';
   bool _isRefreshing = false;
@@ -64,6 +66,20 @@ class _HomePage extends State<HomePage> {
   }
 
   Widget _buildModalContent(BuildContext context) {
+    // Sort the borrow list based on status
+    _borrowList.sort((a, b) {
+      // Define the order of statuses
+      final order = {
+        'confirm': 0,
+        'waiting': 1,
+        'returned': 2,
+        'cancelled': 3,
+      };
+
+      // Compare items based on the defined order
+      return order[a['status']]!.compareTo(order[b['status']]!);
+    });
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -73,8 +89,8 @@ class _HomePage extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Text(
               "Borrow List",
-              style: GoogleFonts.montserrat(
-                color: Color(0xFF800000),
+              style: TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -90,6 +106,71 @@ class _HomePage extends State<HomePage> {
               itemCount: _borrowList.length,
               itemBuilder: (context, index) {
                 final borrowItem = _borrowList[index];
+                Color statusColor = Colors.black; // Default color
+
+                // Set color based on status
+                if (borrowItem['status'] == 'cancelled') {
+                  statusColor = Colors.red;
+                } else if (borrowItem['status'] == 'returned') {
+                  statusColor = Colors.grey;
+                } else if (borrowItem['status'] == 'confirm') {
+                  statusColor = Colors.green;
+                }
+
+                // Check if the status changes to add separator text
+                if (index == 0 ||
+                    _borrowList[index - 1]['status'] != borrowItem['status']) {
+                  // Add separator text indicating the status
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          borrowItem['status'] ?? '',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        leading: Container(
+                          width: 60,
+                          height: 60,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.network(
+                              'http://perpus.amwp.website/storage/${borrowItem['thumbnail']}',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          borrowItem['judul'] ?? '',
+                          style: TextStyle(
+                              color: statusColor), // Apply status color
+                        ),
+                        subtitle: Text(
+                          borrowItem['pengarang'] ?? '',
+                          style: TextStyle(
+                              color: statusColor), // Apply status color
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  BorrowDetailPage(borrowItem: borrowItem),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                }
+
+                // If the status remains the same, just return the ListTile
                 return ListTile(
                   leading: Container(
                     width: 60,
@@ -102,9 +183,23 @@ class _HomePage extends State<HomePage> {
                       ),
                     ),
                   ),
-                  title: Text(borrowItem['judul'] ?? ''),
-                  subtitle: Text(borrowItem['pengarang'] ?? ''),
-                  trailing: Text(borrowItem['status'] ?? ''),
+                  title: Text(
+                    borrowItem['judul'] ?? '',
+                    style: TextStyle(color: statusColor), // Apply status color
+                  ),
+                  subtitle: Text(
+                    borrowItem['pengarang'] ?? '',
+                    style: TextStyle(color: statusColor), // Apply status color
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            BorrowDetailPage(borrowItem: borrowItem),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -169,6 +264,7 @@ class _HomePage extends State<HomePage> {
     _getBorrowList();
     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
       _getBorrowList();
+      _fetchMostPopularBooks();
     });
   }
 
@@ -177,6 +273,83 @@ class _HomePage extends State<HomePage> {
     super.dispose();
     // Cancel the timer to avoid memory leaks
     _timer?.cancel();
+  }
+
+  Future<void> _fetchMostPopularBooks() async {
+    final response = await http.get(
+      Uri.parse('https://perpus.amwp.website/api/auth/listpeminjaman'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      if (jsonData['success']) {
+        // Get the data from the response
+        List<dynamic> data = jsonData['data'];
+
+        // Count the occurrences of each book ID
+        Map<String, int> bookCount = {};
+        data.forEach((book) {
+          String bookId = book['buku_id'].toString();
+          bookCount[bookId] = (bookCount[bookId] ?? 0) + 1;
+        });
+
+        // Sort the book IDs based on their occurrences (popularity)
+        List<String> sortedBookIds = bookCount.keys.toList()
+          ..sort((a, b) => bookCount[b]!.compareTo(bookCount[a]!));
+
+        // Get the top 3 most popular book IDs
+        List<String> top3BookIds = sortedBookIds.take(3).toList();
+
+        // Fetch book thumbnails for the top 3 most popular books
+        List<String> mostPopularBookThumbnails = [];
+        for (var bookId in top3BookIds) {
+          final book = data.firstWhere((book) => book['buku_id'] == bookId,
+              orElse: () => {});
+          if (book.isNotEmpty && book.containsKey('thumbnail')) {
+            mostPopularBookThumbnails.add(book['thumbnail']);
+          }
+        }
+
+        setState(() {
+          _mostPopularBookThumbnails = mostPopularBookThumbnails;
+        });
+      }
+    } else {
+      print(
+          'Failed to fetch most popular books. Status code: ${response.statusCode}');
+    }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+
+    if (token.isEmpty) {
+      // If no token is found, display a message or take other action
+      return;
+    }
+
+    final list = await http.get(
+      Uri.parse('http://perpus.amwp.website/api/auth/listbuku'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (list.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // Check if 'bukus' is present and is not null
+      if (data['bukus'] != null) {
+        setState(() {
+          _bukus = List<Map<String, dynamic>>.from(data['bukus']);
+        });
+      } else {
+        // Handle the case where 'bukus' is null or not present
+        // For example, log an error or show a message
+        print('Error: bukus is null or not present in the response');
+      }
+    } else {
+      // Handle error response
+      print(
+          'Error: Failed to fetch list buku. Status code: ${response.statusCode}');
+    }
   }
 
   Future<void> _getListBuku() async {
@@ -329,48 +502,60 @@ class _HomePage extends State<HomePage> {
                             fontWeight: FontWeight.normal,
                           )),
                       CarouselSlider(
-                          items: [
-                            Container(
-                              margin: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                image: DecorationImage(
+                        items: _mostPopularBookThumbnails
+                            .map<Widget>((thumbnailUrl) {
+                          // Find the corresponding book in _bukus list
+                          final buku = _bukus.firstWhere(
+                            (book) => book['thumbnail'] == thumbnailUrl,
+                            orElse: () =>
+                                {}, // Return an empty map if book is not found
+                          );
+
+                          // Check if buku is not empty before using it
+                          if (buku.isNotEmpty) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        BookOffline(bookId: buku['id']),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  image: DecorationImage(
                                     image: NetworkImage(
-                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                    fit: BoxFit.cover),
+                                      'http://perpus.amwp.website/storage/$thumbnailUrl',
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                    fit: BoxFit.cover),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                        "https://cdn.pixabay.com/photo/2017/01/08/13/58/cube-1963036__340.jpg"),
-                                    fit: BoxFit.cover),
-                              ),
-                            )
-                          ],
-                          options: CarouselOptions(
-                              height: 180.0,
-                              enlargeCenterPage: true,
-                              autoPlay: true,
-                              aspectRatio: 16 / 9,
-                              autoPlayCurve: Curves.fastOutSlowIn,
-                              enableInfiniteScroll: true,
-                              autoPlayAnimationDuration:
-                                  Duration(milliseconds: 800),
-                              viewportFraction: 0.8)),
+                            );
+                          } else {
+                            // Placeholder for loading animation
+                            return Center(
+                              child:
+                                  CircularProgressIndicator(), // Show CircularProgressIndicator while loading
+                            );
+                          }
+                        }).toList(),
+                        options: CarouselOptions(
+                          height: 180.0,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                          aspectRatio: 16 / 9,
+                          autoPlayCurve: Curves.fastOutSlowIn,
+                          enableInfiniteScroll: true,
+                          autoPlayAnimationDuration:
+                              Duration(milliseconds: 800),
+                          viewportFraction: 0.8,
+                        ),
+                      ),
                     ],
                   )),
               Padding(
