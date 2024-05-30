@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class BookOffline extends StatefulWidget {
   final int bookId;
@@ -94,10 +95,8 @@ class _BookOfflineState extends State<BookOffline> {
     String token = prefs.getString('token') ?? '';
 
     if (token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: No token found. Please log in.'),
-        backgroundColor: Colors.red,
-      ));
+      _showAlertDialog(
+          'Error', 'No token found. Please log in.', Colors.red, Icons.error);
       return;
     }
 
@@ -107,22 +106,61 @@ class _BookOfflineState extends State<BookOffline> {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Book borrowed successfully!'),
-        backgroundColor: Colors.green,
-      ));
+      _showAlertDialog(
+          'Success', 'Peminjaman sukses!', Colors.green, Icons.check_circle);
     } else if (response.statusCode == 409) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: Book is already borrowed.'),
-        backgroundColor: Colors.orange,
-      ));
+      _showAlertDialog(
+          'Info', 'Buku sudah dipinjam.', Colors.orange, Icons.error);
+    } else if (response.statusCode == 400) {
+      _showAlertDialog('Info', 'Buku Habis.', Colors.orange, Icons.error);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-            'Error: Failed to borrow book. Status code: ${response.statusCode}'),
-        backgroundColor: Colors.red,
-      ));
+      _showAlertDialog(
+          'Error',
+          'Failed to borrow book. Status code: ${response.statusCode}',
+          Colors.red,
+          Icons.error);
     }
+  }
+
+  void _showAlertDialog(
+      String title, String message, Color color, IconData iconData) {
+    Alert(
+      context: context,
+      type: AlertType.none,
+      title: '',
+      content: Column(
+        children: [
+          Icon(
+            iconData,
+            size: 50,
+            color: color,
+          ),
+          SizedBox(height: 10),
+          Text(
+            title,
+            style: TextStyle(color: color, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          Text(message),
+        ],
+      ),
+      style: AlertStyle(
+        isCloseButton: false,
+        animationType: AnimationType.grow,
+        titleStyle: TextStyle(color: color),
+        descStyle: TextStyle(color: Colors.black),
+      ),
+      buttons: [
+        DialogButton(
+          child: Text(
+            'OK',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+          color: color,
+        ),
+      ],
+    ).show();
   }
 
   Future<void> _addToFavorite() async {

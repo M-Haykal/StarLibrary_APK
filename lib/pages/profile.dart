@@ -3,17 +3,76 @@ import 'package:starlibrary/layouts/editprof.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starlibrary/pages/welcome.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class ProfileApp extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    // Menghapus SharedPreferences
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
 
+    // Menghapus data aplikasi
+    await _deleteAppData();
+
+    // Navigasi ke halaman Welcome
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => Welcome()),
       (route) => false,
     );
+  }
+
+  Future<void> _deleteAppData() async {
+    try {
+      // Mendapatkan direktori penyimpanan lokal
+      Directory tempDir = await getTemporaryDirectory();
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      Directory appSupportDir = await getApplicationSupportDirectory();
+      Directory appLibraryDir = Directory.systemTemp;
+
+      // Menghapus semua file dalam direktori sementara
+      await _deleteFilesInDirectory(tempDir);
+
+      // Menghapus semua file dalam direktori dokumen aplikasi
+      await _deleteFilesInDirectory(appDocDir);
+
+      // Menghapus semua file dalam direktori support aplikasi
+      await _deleteFilesInDirectory(appSupportDir);
+
+      // Menghapus semua file dalam direktori library aplikasi
+      await _deleteFilesInDirectory(appLibraryDir);
+
+      // Menghapus semua cache
+      await _clearCache();
+    } catch (e) {
+      print("Error saat menghapus data aplikasi: $e");
+    }
+  }
+
+  Future<void> _deleteFilesInDirectory(Directory directory) async {
+    if (directory.existsSync()) {
+      List<FileSystemEntity> files = directory.listSync();
+      for (FileSystemEntity file in files) {
+        if (file is File) {
+          file.deleteSync();
+        } else if (file is Directory) {
+          await _deleteFilesInDirectory(file);
+          file.deleteSync();
+        }
+      }
+    }
+  }
+
+  Future<void> _clearCache() async {
+    try {
+      Directory cacheDir = await getTemporaryDirectory();
+      if (cacheDir.existsSync()) {
+        cacheDir.deleteSync(recursive: true);
+      }
+    } catch (e) {
+      print("Error saat menghapus cache: $e");
+    }
   }
 
   Future<String> _getProfileImage() async {
