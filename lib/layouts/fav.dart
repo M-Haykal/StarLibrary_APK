@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -125,9 +126,14 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorite Book'),
-        centerTitle: true, // Ensuring the title is centered
-        backgroundColor: Colors.white, // Ensure background is white
+        title: Text(
+          'Favorite Book',
+          style: GoogleFonts.montserrat(
+            color: Color(0xFF800000),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
         titleTextStyle: TextStyle(
           color: Colors.black,
           fontSize: 20,
@@ -152,8 +158,8 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Your Favorite Books\nin one place',
-                style: TextStyle(
+                'Your favorite book here',
+                style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -200,7 +206,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
                                       Image.network(
                                         'http://perpus.amwp.website/storage/${favorite['thumbnail']}',
                                         fit: BoxFit.cover,
-                                        height: 150,
+                                        height: 85,
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),

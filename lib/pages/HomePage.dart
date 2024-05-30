@@ -73,8 +73,8 @@ class _HomePage extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Text(
               "Borrow List",
-              style: TextStyle(
-                fontSize: 20,
+              style: GoogleFonts.montserrat(
+                color: Color(0xFF800000),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -382,11 +382,11 @@ class _HomePage extends State<HomePage> {
                     )),
               ),
               GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 1.0),
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
+                  crossAxisCount: 2,
                   childAspectRatio: 0.7,
                   crossAxisSpacing: 5.0,
                   mainAxisSpacing: 5.0,

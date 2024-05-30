@@ -15,7 +15,7 @@ class DetailPage extends StatelessWidget {
         title: Text(
           "Offline Book Detail",
           style: GoogleFonts.montserrat(
-            color: Colors.black,
+            color: Color(0xFF800000),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -62,7 +62,7 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 24),
               Text(
                 buku.judul ?? 'No Title',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF333333),
@@ -71,7 +71,7 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'Penerbit: ${buku.penerbit ?? 'Unknown'}',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF666666),
@@ -80,7 +80,7 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 'Pengarang: ${buku.pengarang ?? 'Unknown'}',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF666666),
@@ -89,7 +89,7 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'Deskripsi',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF333333),
@@ -98,7 +98,7 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 buku.deskripsi ?? 'No Description',
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: Color(0xFF666666),
                 ),
@@ -119,7 +119,7 @@ class DetailPage extends StatelessWidget {
                       ),
                       child: Text(
                         'Favorite',
-                        style: GoogleFonts.montserrat(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -152,7 +152,7 @@ class DetailPage extends StatelessWidget {
                       ),
                       child: Text(
                         'Reading Now',
-                        style: GoogleFonts.montserrat(
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

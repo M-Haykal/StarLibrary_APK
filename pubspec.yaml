@@ -26,7 +26,7 @@ dependencies:
   # flutter_rating_bar: ^4.0.1
   intl: ^0.17.0
   flutter_cached_pdfview: ^0.4.2
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -36,20 +36,19 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/Logo.png"
+  image_path: "assets/logo.png"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/contoh.jpg
     - assets/logo.png
     - assets/Asset1.png
     - assets/Asset2.png
     - assets/Asset3.png
-    - assets/bg.png
     - assets/part1.png
     - assets/part2.png
     - assets/part3.png
+    - assets/book.png
 
 flutter_native_splash:
   # This package generates native code to customize Flutter's default white native splash screen
@@ -75,7 +74,7 @@ flutter_native_splash:
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: assets/logo.png
+  image: assets/book.png
 
   # The branding property allows you to specify an image used as branding in the splash screen.
   # It must be a png file. It is supported for Android, iOS and the Web.  For Android 12,
@@ -107,7 +106,7 @@ flutter_native_splash:
     # 640 pixels in diameter.
     # App icon without an icon background: This should be 1152×1152 pixels, and fit within a circle
     # 768 pixels in diameter.
-    image: assets/logo.png
+    image: assets/book.png
 
     # Splash screen background color.
     color: "#800000"

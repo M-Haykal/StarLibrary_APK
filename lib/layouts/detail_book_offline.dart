@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -193,8 +194,13 @@ class _BookOfflineState extends State<BookOffline> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title:
-            Text(_bookDetails!['judul'], style: TextStyle(color: Colors.black)),
+        title: Text(
+          _bookDetails!['judul'],
+          style: GoogleFonts.montserrat(
+            color: Color(0xFF800000),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -240,7 +246,7 @@ class _BookOfflineState extends State<BookOffline> {
                   SizedBox(height: 16),
                   Text(
                     _bookDetails!['judul'],
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -249,7 +255,7 @@ class _BookOfflineState extends State<BookOffline> {
                   SizedBox(height: 8),
                   Text(
                     _bookDetails!['deskripsi'] ?? 'No description available',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.grey[800],
                     ),
@@ -257,7 +263,7 @@ class _BookOfflineState extends State<BookOffline> {
                   SizedBox(height: 8),
                   Text(
                     'Author: ${_bookDetails!['pengarang']}',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -266,7 +272,7 @@ class _BookOfflineState extends State<BookOffline> {
                   SizedBox(height: 8),
                   Text(
                     'Publisher: ${_bookDetails!['penerbit']}',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
                     ),
@@ -274,7 +280,7 @@ class _BookOfflineState extends State<BookOffline> {
                   SizedBox(height: 8),
                   Text(
                     'Stock: ${_bookDetails!['stok_buku']}',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
                     ),
@@ -311,92 +317,125 @@ class _BookOfflineState extends State<BookOffline> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      return IconButton(
-                        icon: Icon(
-                          index < _rating ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 32,
-                        ),
-                        onPressed: () => _setRating(index + 1),
-                      );
-                    }),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: _reviewController,
-                    decoration: InputDecoration(
-                      labelText: 'Write a Review',
-                      border: OutlineInputBorder(),
-                      fillColor: Colors.grey[200],
-                      filled: true,
+                  Card(
+                    elevation: 5,
+                    color: Colors.white.withOpacity(0.9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    maxLines: 3,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _submitReview,
-                    child: Text(
-                      'Submit Review',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  Text(
-                    'Reviews',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _reviews.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        elevation: 3,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  _buildRatingStars(
-                                      int.parse(_reviews[index]['rating'])),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    _reviews[index]['user_name'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    _formatDate(_reviews[index]['created_at']),
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text(_reviews[index]['comment']),
-                            ],
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 16),
+                          Text(
+                            'Review Book',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(5, (index) {
+                              return IconButton(
+                                icon: Icon(
+                                  index < _rating
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 32,
+                                ),
+                                onPressed: () => _setRating(index + 1),
+                              );
+                            }),
+                          ),
+                          SizedBox(height: 16),
+                          TextField(
+                            controller: _reviewController,
+                            decoration: InputDecoration(
+                              labelText: 'Write a comment',
+                              border: OutlineInputBorder(),
+                              fillColor: Colors.grey[200],
+                              filled: true,
+                            ),
+                            maxLines: 3,
+                          ),
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _submitReview,
+                            child: Text(
+                              'Send Review',
+                              style: GoogleFonts.poppins(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                          ),
+                          SizedBox(height: 24),
+                          Text(
+                            'Reviews',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _reviews.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                elevation: 3,
+                                margin: EdgeInsets.symmetric(vertical: 8),
+                                child: Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          _buildRatingStars(int.parse(
+                                              _reviews[index]['rating'])),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            _reviews[index]['user_name'],
+                                            style: GoogleFonts.montserrat(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          Text(
+                                            _formatDate(
+                                                _reviews[index]['created_at']),
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        _reviews[index]['comment'],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
