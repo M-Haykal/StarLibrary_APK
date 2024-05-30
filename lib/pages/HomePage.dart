@@ -414,7 +414,7 @@ class _HomePage extends State<HomePage> {
                     child: Card(
                       clipBehavior: Clip.antiAlias,
                       elevation: 3,
-                      margin: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(3),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -426,7 +426,7 @@ class _HomePage extends State<HomePage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(6.0),
                             child: Text(
                               'Title: ${buku['judul']}',
                               style: TextStyle(fontWeight: FontWeight.bold),
@@ -435,7 +435,7 @@ class _HomePage extends State<HomePage> {
                           ),
                           Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 6.0),
+                                const EdgeInsets.symmetric(horizontal: 4.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
