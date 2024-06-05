@@ -67,6 +67,9 @@ class _OnlineBookState extends State<OnlineBook> {
                 ),
                 SizedBox(height: 10),
                 TextField(
+                  onChanged: (text) {
+                    _performSearch(text);
+                  },
                   decoration: InputDecoration(
                     hintText: "Search",
                     prefixIcon: Icon(Icons.search),
@@ -89,6 +92,10 @@ class _OnlineBookState extends State<OnlineBook> {
                       return Center(child: Text('No Data Available'));
                     } else {
                       final data = snapshot.data!.data!;
+                      final filteredData = data.where((buku) {
+                        final title = buku.judul?.toLowerCase() ?? '';
+                        return title.contains(_searchText.toLowerCase());
+                      }).toList();
                       return GridView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         physics: NeverScrollableScrollPhysics(),
@@ -99,16 +106,9 @@ class _OnlineBookState extends State<OnlineBook> {
                           crossAxisSpacing: 5.0,
                           mainAxisSpacing: 5.0,
                         ),
-                        itemCount: data.where((buku) {
-                          final title = buku.judul.toString().toLowerCase();
-                          return title.contains(_searchText.toLowerCase());
-                        }).length,
+                        itemCount: filteredData.length,
                         itemBuilder: (context, index) {
-                          final filteredBukus = data.where((buku) {
-                            final title = buku.judul.toString().toLowerCase();
-                            return title.contains(_searchText.toLowerCase());
-                          }).toList();
-                          final item = data[index];
+                          final item = filteredData[index];
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -140,7 +140,7 @@ class _OnlineBookState extends State<OnlineBook> {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      'Title: ${item.judul}',
+                                      '${item.judul}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                       overflow: TextOverflow.ellipsis,
