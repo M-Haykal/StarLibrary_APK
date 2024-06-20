@@ -73,7 +73,10 @@ class _HomePage extends State<HomePage> {
         'confirm': 0,
         'waiting': 1,
         'returned': 2,
-        'cancelled': 3,
+        'hilang': 3,
+        'rusak': 4,
+        'telat': 5,
+        'cancelled': 6,
       };
 
       // Compare items based on the defined order
@@ -277,7 +280,7 @@ class _HomePage extends State<HomePage> {
 
   Future<void> _fetchMostPopularBooks() async {
     final response = await http.get(
-      Uri.parse('https://perpus.amwp.website/api/auth/listpeminjaman'),
+      Uri.parse('http://perpus.amwp.website/api/auth/listpeminjaman'),
     );
 
     if (response.statusCode == 200) {
@@ -571,7 +574,7 @@ class _HomePage extends State<HomePage> {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                  crossAxisCount: crossAxisCount,
                   childAspectRatio: 0.7,
                   crossAxisSpacing: 5.0,
                   mainAxisSpacing: 5.0,
@@ -599,7 +602,7 @@ class _HomePage extends State<HomePage> {
                     child: Card(
                       clipBehavior: Clip.antiAlias,
                       elevation: 3,
-                      margin: EdgeInsets.all(3),
+                      margin: EdgeInsets.all(5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -611,16 +614,16 @@ class _HomePage extends State<HomePage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(6.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Title: ${buku['judul']}',
+                              '${buku['judul']}',
                               style: TextStyle(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 4.0),
+                                const EdgeInsets.symmetric(horizontal: 6.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

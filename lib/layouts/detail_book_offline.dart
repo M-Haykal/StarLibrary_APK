@@ -20,12 +20,15 @@ class _BookOfflineState extends State<BookOffline> {
   int _rating = 0;
   TextEditingController _reviewController = TextEditingController();
   List<Map<String, dynamic>> _reviews = [];
+  double? _averageRating;
 
   @override
   void initState() {
     super.initState();
     _fetchBookDetails();
-    _fetchReviews();
+    _fetchReviews().then((_) {
+      _calculateAverageRating();
+    });
   }
 
   Future<void> _fetchBookDetails() async {
@@ -88,6 +91,25 @@ class _BookOfflineState extends State<BookOffline> {
       print(
           'Error: Failed to fetch reviews. Status code: ${response.statusCode}');
     }
+  }
+
+  Future<void> _calculateAverageRating() async {
+    if (_reviews.isEmpty) {
+      setState(() {
+        _averageRating = null;
+      });
+      return;
+    }
+
+    double totalRating = 0;
+    for (var review in _reviews) {
+      totalRating += double.parse(review['rating']);
+    }
+    double averageRating = totalRating / _reviews.length;
+
+    setState(() {
+      _averageRating = averageRating;
+    });
   }
 
   Future<void> _borrowBook() async {
@@ -217,6 +239,7 @@ class _BookOfflineState extends State<BookOffline> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     if (_bookDetails == null) {
       return Scaffold(
@@ -323,6 +346,18 @@ class _BookOfflineState extends State<BookOffline> {
                       color: Colors.black87,
                     ),
                   ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Average Rating: ',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  _buildAverageRatingStars(
+                      _averageRating ?? 0), // Call the widget here
+
                   SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -366,53 +401,7 @@ class _BookOfflineState extends State<BookOffline> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 16),
-                          Text(
-                            'Review Book',
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(5, (index) {
-                              return IconButton(
-                                icon: Icon(
-                                  index < _rating
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                  color: Colors.amber,
-                                  size: 32,
-                                ),
-                                onPressed: () => _setRating(index + 1),
-                              );
-                            }),
-                          ),
-                          SizedBox(height: 16),
-                          TextField(
-                            controller: _reviewController,
-                            decoration: InputDecoration(
-                              labelText: 'Write a comment',
-                              border: OutlineInputBorder(),
-                              fillColor: Colors.grey[200],
-                              filled: true,
-                            ),
-                            maxLines: 3,
-                          ),
-                          SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _submitReview,
-                            child: Text(
-                              'Send Review',
-                              style: GoogleFonts.poppins(color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                            ),
-                          ),
+                          // Review Book Section (Commented out)
                           SizedBox(height: 24),
                           Text(
                             'Reviews',
@@ -423,52 +412,68 @@ class _BookOfflineState extends State<BookOffline> {
                             ),
                           ),
                           SizedBox(height: 8),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _reviews.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                elevation: 3,
-                                margin: EdgeInsets.symmetric(vertical: 8),
-                                child: Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          _buildRatingStars(int.parse(
-                                              _reviews[index]['rating'])),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            _reviews[index]['user_name'],
-                                            style: GoogleFonts.montserrat(
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                          Container(
+                            height: 500, // Set the desired height here
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        NeverScrollableScrollPhysics(), // Prevent internal scrolling
+                                    itemCount: _reviews.length,
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        elevation: 3,
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 8),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(12),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  _buildRatingStars(int.parse(
+                                                      _reviews[index]
+                                                          ['rating'])),
+                                                  SizedBox(width: 8),
+                                                  Text(
+                                                    _reviews[index]
+                                                        ['user_name'],
+                                                    style:
+                                                        GoogleFonts.montserrat(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Spacer(),
+                                                  Text(
+                                                    _formatDate(_reviews[index]
+                                                        ['created_at']),
+                                                    style: GoogleFonts.poppins(
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                _reviews[index]['comment'],
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Spacer(),
-                                          Text(
-                                            _formatDate(
-                                                _reviews[index]['created_at']),
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        _reviews[index]['comment'],
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 15,
                                         ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                ),
-                              );
-                            },
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -534,6 +539,8 @@ class _BookOfflineState extends State<BookOffline> {
           content: Text('Review submitted successfully!'),
           backgroundColor: Colors.green,
         ));
+        // Recalculate average rating
+        _calculateAverageRating();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
@@ -554,6 +561,39 @@ class _BookOfflineState extends State<BookOffline> {
           return Icon(Icons.star_border, color: Colors.amber);
         }
       }),
+    );
+  }
+
+  Widget _buildAverageRatingStars(double averageRating) {
+    int fullStars = averageRating.floor();
+    double remainder = averageRating - fullStars;
+
+    List<Widget> stars = List.generate(5, (index) {
+      if (index < fullStars) {
+        return Icon(Icons.star, color: Colors.amber);
+      } else if (index == fullStars && remainder > 0) {
+        // If there's a remainder, render a half-star
+        return Icon(Icons.star_half, color: Colors.amber);
+      } else {
+        return Icon(Icons.star_border, color: Colors.amber);
+      }
+    });
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...stars,
+        SizedBox(width: 4), // Spacer between stars and average rating value
+        Text(
+          averageRating.toStringAsFixed(
+              1), // Display average rating with one decimal place
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 

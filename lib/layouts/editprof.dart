@@ -124,7 +124,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     var request = http.MultipartRequest(
-        'POST', Uri.parse('https://perpus.amwp.website/api/auth/edit-profile'));
+        'POST', Uri.parse('http://perpus.amwp.website/api/auth/edit-profile'));
     request.fields['id'] = id.toString();
     request.fields['nama'] = username;
     request.fields['email'] = email;

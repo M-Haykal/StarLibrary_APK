@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:starlibrary/layouts/detail_book_offline.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           iconTheme: IconThemeData(color: Colors.black),
-          centerTitle: true, // Ensuring the title is centered
+          centerTitle: true,
         ),
       ),
       home: BookshelfScreen(),
@@ -107,7 +108,6 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
     );
 
     if (response.statusCode == 200) {
-      // Refresh favorites after removal
       _fetchFavorites();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Book removed from favorites successfully!'),
@@ -127,117 +127,108 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Favorite Book',
+          'Favorite Books',
           style: GoogleFonts.montserrat(
             color: Color(0xFF800000),
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme:
-            IconThemeData(color: Colors.black), // Ensure icon color is black
+        iconTheme: IconThemeData(color: Colors.black),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Use the arrow back icon
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Define the action when the icon is pressed
-            // For example, navigate to the previous screen
             Navigator.of(context).pop();
           },
         ),
       ),
-      body: SingleChildScrollView(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 8), // Add some top padding
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Your favorite book here',
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              'Your Favorite Books',
+              style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            SizedBox(height: 16),
+            Expanded(
               child: _favorites.isEmpty
                   ? Center(child: CircularProgressIndicator())
-                  : Container(
-                      height: 400, // Set a specific height for the grid
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 16.0,
-                          mainAxisSpacing: 16.0,
-                          childAspectRatio: 0.7,
-                        ),
-                        itemCount: _favorites.length,
-                        itemBuilder: (context, index) {
-                          final favorite = _favorites[index]['buku'];
-                          return GestureDetector(
-                            onTap: () {
-                              // Define the action when the book is tapped
-                              // For example, navigate to book details screen
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 10,
-                                    spreadRadius: 1,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
+                  : GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: MediaQuery.of(context).orientation ==
+                                Orientation.portrait
+                            ? 2
+                            : 3,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        childAspectRatio: 0.6,
+                      ),
+                      itemCount: _favorites.length,
+                      itemBuilder: (context, index) {
+                        final favorite = _favorites[index]['buku'];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BookOffline(bookId: favorite['id']),
                               ),
-                              child: Stack(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Image.network(
-                                        'http://perpus.amwp.website/storage/${favorite['thumbnail']}',
-                                        fit: BoxFit.cover,
-                                        height: 85,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          favorite['judul'],
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
+                            );
+                          },
+                          child: Card(
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(15),
                                   ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: IconButton(
+                                  child: Image.network(
+                                    'http://perpus.amwp.website/storage/${favorite['thumbnail']}',
+                                    fit: BoxFit.cover,
+                                    height: 150,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    favorite['judul'],
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                Spacer(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
                                       icon: Icon(Icons.delete_forever),
+                                      color: Colors.red,
                                       onPressed: () {
-                                        // Remove from favorites
                                         _removeFromFavorites(favorite['id']);
                                       },
                                     ),
-                                  ),
-                                ],
-                              ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
             ),
           ],
